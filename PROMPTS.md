@@ -70,3 +70,24 @@
 
 ### Action Taken
 - Created `PROMPTS.md` containing the structured record of all user prompts, design architecture, implementation details, and API schemas.
+
+---
+
+## 5. "Talk to Us" Tab & Disqus Forum Integration
+
+### User Prompt
+> Create a tab "talk to us" and embed a disqus forum using the following:
+> 1. Discussion Embed (`DiscussionEmbed` with shortname `mas-exchanger1`)
+> 2. Comment Count (`CommentCount` with shortname `mas-exchanger1`)
+> 3. Single Sign-On (SSO) configuration support
+
+### Solution & Summary
+- Installed `disqus-react` and `prop-types` dependencies.
+- Added TypeScript declarations in `src/types/disqus-react.d.ts`.
+- Created `src/components/TalkToUs.tsx`:
+  - Embeds `<DiscussionEmbed shortname="mas-exchanger1" config={{ url, identifier, title, language: 'en', remoteAuthS3, apiKey, sso }} />`.
+  - Integrates `<CommentCount shortname="mas-exchanger1" config={...} />` for live comment tracking.
+  - Added multi-channel topic selector (General, Money Changers, Cards & Travel, Features).
+  - Included interactive Single Sign-On (SSO) developer settings drawer.
+  - Added fallback direct link to `https://mas-exchanger1.disqus.com`.
+- Updated `src/components/Navbar.tsx` and `src/App.tsx` with the "Talk to Us" navigation tab and footer link.

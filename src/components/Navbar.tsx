@@ -79,6 +79,16 @@ export const Navbar: React.FC<NavbarProps> = ({
             )}
           </button>
           <button
+            onClick={() => setActiveTab('talk-to-us')}
+            className={`whitespace-nowrap shrink-0 transition-colors py-1 ${
+              activeTab === 'talk-to-us'
+                ? 'text-neutral-950 font-semibold border-b-2 border-rose-600'
+                : 'hover:text-neutral-900'
+            }`}
+          >
+            Talk to Us
+          </button>
+          <button
             onClick={onOpenMasConfig}
             className="whitespace-nowrap shrink-0 text-neutral-600 hover:text-neutral-900 transition-colors py-1 flex items-center gap-1.5"
           >

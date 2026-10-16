@@ -12,6 +12,7 @@ import {
   Info,
   Clock,
   ExternalLink,
+  MessageSquare,
 } from 'lucide-react';
 
 import { CurrencyCategory, CurrencyRate, MASConfig } from './types/currency';
@@ -22,6 +23,7 @@ import { CurrencyTable } from './components/CurrencyTable';
 import { RateDetailModal } from './components/RateDetailModal';
 import { MASConfigModal } from './components/MASConfigModal';
 import { WatchlistBanner } from './components/WatchlistBanner';
+import { TalkToUs } from './components/TalkToUs';
 
 import {
   getStoredFavorites,
@@ -284,6 +286,17 @@ export default function App() {
               <Star className="w-3.5 h-3.5 text-amber-500" />
               <span>Watchlist ({favorites.length})</span>
             </button>
+            <button
+              onClick={() => setActiveTab('talk-to-us')}
+              className={`px-4 py-2 text-xs font-semibold rounded-md transition-colors cursor-pointer flex items-center gap-1.5 ${
+                activeTab === 'talk-to-us'
+                  ? 'bg-white text-neutral-900 shadow-xs'
+                  : 'text-neutral-600 hover:text-neutral-900'
+              }`}
+            >
+              <MessageSquare className="w-3.5 h-3.5 text-rose-600" />
+              <span>Talk to Us</span>
+            </button>
           </div>
 
           <div className="hidden sm:flex items-center gap-2 text-xs text-neutral-500 font-mono">
@@ -489,6 +502,13 @@ export default function App() {
           </div>
         )}
 
+        {/* Tab 3: Talk to Us (Disqus Forum Embed) */}
+        {activeTab === 'talk-to-us' && (
+          <div className="space-y-6">
+            <TalkToUs />
+          </div>
+        )}
+
         {/* MAS Statutory & Regulatory Reference Notice */}
         <div className="mt-12 p-6 rounded-xl bg-white border border-neutral-200 shadow-2xs">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
@@ -541,6 +561,13 @@ export default function App() {
             <span>Singapore Exchange Rate Desk & Currency Converter</span>
           </div>
           <div className="flex items-center gap-4">
+            <button
+              onClick={() => setActiveTab('talk-to-us')}
+              className="hover:text-neutral-900 transition-colors cursor-pointer"
+            >
+              Talk to Us (Forum)
+            </button>
+            <span>·</span>
             <button
               onClick={() => setIsMasModalOpen(true)}
               className="hover:text-neutral-900 transition-colors cursor-pointer"
