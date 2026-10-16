@@ -1,0 +1,6 @@
+{
+  "name": "SingaRate - Singapore Currency Exchange",
+  "description": "Real-time Singapore exchange rate monitor, currency converter, and MAS reference desk with favorites, search, and retail spread simulator.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
