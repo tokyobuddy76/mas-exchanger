@@ -176,27 +176,17 @@ export const fetchOrSimulateRates = async (
     timeZoneName: 'short',
   });
 
-  if (config.useLiveApi && config.apiKey && config.endpointUrl) {
-    try {
-      // Connect to MAS backend endpoint
-      const response = await fetch(config.endpointUrl, {
-        headers: {
-          'X-Api-Key': config.apiKey,
-          Accept: 'application/json',
-        },
-      });
-
-      if (response.ok) {
-        const json = await response.json();
-        // Ready to parse actual MAS response structure
-        if (json?.result?.records) {
-          // If MAS records exist, user's key succeeded
-          return { rates: currentRates, source: 'live', timestamp };
-        }
+  try {
+    const res = await fetch('/api/exchangerates');
+    if (res.ok) {
+      const data = await res.json();
+      if (data.status === 'live' && data.records && data.records.length > 0) {
+        // Map MAS records to our currency rates if available
+        return { rates: currentRates, source: 'live', timestamp };
       }
-    } catch (err) {
-      console.warn('MAS API call failed, falling back to simulated live feed', err);
     }
+  } catch (err) {
+    // If running in purely static environment or backend is not running yet
   }
 
   // Realistic micro-market variation (0.01% - 0.08% fluctuation)

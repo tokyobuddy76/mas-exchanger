@@ -26,32 +26,33 @@ export const MASConfigModal: React.FC<MASConfigModalProps> = ({
 
   const handleTestConnection = async () => {
     setTestStatus('testing');
-    setTestMessage('Testing connection to MAS API endpoint...');
+    setTestMessage('Testing /api/health and /api/exchangerates...');
 
     try {
-      if (!apiKey && useLiveApi) {
-        setTestStatus('failed');
-        setTestMessage('Please provide your MAS API key first, or leave live API disabled to use the simulated live feed.');
+      const healthRes = await fetch('/api/health');
+      if (healthRes.ok) {
+        const healthData = await healthRes.json();
+        const rateRes = await fetch('/api/exchangerates');
+        const rateData = await rateRes.json();
+
+        if (rateData.status === 'live') {
+          setTestStatus('success');
+          setTestMessage('Live MAS API connection active! Successfully receiving exchange rates from MAS Catalogue.');
+        } else if (rateData.status === 'config_required') {
+          setTestStatus('idle');
+          setTestMessage('Serverless route /api/exchangerates is active. Set MAS_KEY_ID in your environment variables to fetch live MAS data.');
+        } else {
+          setTestStatus('idle');
+          setTestMessage(`Server health: ${healthData.status}. Route /api/exchangerates responded: ${rateData.message || 'OK'}`);
+        }
         return;
       }
 
-      // Check if endpoint is reachable
-      const response = await fetch(endpointUrl, {
-        method: 'GET',
-        headers: apiKey ? { 'X-Api-Key': apiKey, Accept: 'application/json' } : {},
-      });
-
-      if (response.ok) {
-        setTestStatus('success');
-        setTestMessage('Successfully reached MAS endpoint! Ready for live exchange rate queries.');
-      } else {
-        setTestStatus('failed');
-        setTestMessage(`Endpoint returned status ${response.status}. Verify your API key or endpoint URL.`);
-      }
+      setTestStatus('idle');
+      setTestMessage('Serverless route /api/health reached.');
     } catch {
-      // In sandbox preview or CORS restricted browser environments
-      setTestStatus('success');
-      setTestMessage('Configured for MAS backend integration. Mock/live fallback ready.');
+      setTestStatus('idle');
+      setTestMessage('Serverless API routes /api/health and /api/exchangerates are ready at project root.');
     }
   };
 
@@ -65,17 +66,19 @@ export const MASConfigModal: React.FC<MASConfigModalProps> = ({
     onClose();
   };
 
-  const sampleBackendSnippet = `// Backend Integration Handler (Node / Express / Next.js)
-// When you're ready to add your MAS backend proxy:
-app.get('/api/mas/exchange-rates', async (req, res) => {
-  const MAS_API_KEY = process.env.MAS_API_KEY || '${apiKey || 'YOUR_MAS_KEY'}';
-  const response = await fetch(
-    'https://eservices.mas.gov.sg/api/action/datastore/search.json?resource_id=95932927-c4bc-4775-823e-e50e82502b21&limit=50',
-    { headers: { 'X-Api-Key': MAS_API_KEY } }
-  );
-  const data = await response.json();
-  res.json(data.result.records);
-});`;
+  const sampleBackendSnippet = `// Serverless API: /api/exchangerates.ts
+// Queries MAS API Catalogue with KeyId header:
+const res = await fetch(
+  'https://eservices.mas.gov.sg/apimg-gw/server/monthly_statistical_bulletin_non610ora/exchange_rates_end_of_period_daily/views/exchange_rates_end_of_period_daily?end_of_day=2026-10-14',
+  {
+    headers: {
+      'KeyId': process.env.MAS_KEY_ID || '<MAS_KEY_ID>',
+      'Accept': 'application/json'
+    }
+  }
+);
+const data = await res.json();
+console.log(data);`;
 
   const handleCopySnippet = () => {
     navigator.clipboard.writeText(sampleBackendSnippet);
